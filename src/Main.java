@@ -9,23 +9,40 @@ public class Main {
 
     public static void main(String[] args) {
         System.out.println("🚀 INICIANDO SISTEMA DE GESTIÓN DE TIENDA...");
+        System.out.println("📦 Cargando estructuras de datos:");
+        System.out.println("   • Árbol binario (Inventario)");
+        System.out.println("   • Lista enlazada (Catálogo global)");
+        System.out.println("   • Cola de prioridad (Clientes)");
+        System.out.println("   • ShoppingCart (Carritos de compra)");
+
         inicializarDatosEjemplo();
         menuPrincipal();
     }
 
     private static void inicializarDatosEjemplo() {
-        // Productos para el inventario de la tienda
+        System.out.println("\n📦 Inicializando datos de ejemplo...");
+
+        // 📌 Productos para la LISTA GLOBAL (catálogo general)
+        System.out.println("\n📋 Cargando catálogo global de productos...");
+        listaGlobal.insertarFinal(new Producto("FIFA World Cup 26 Trionda Pro Ball", 170, "Futbol clasico", null, 2, 100));
+        listaGlobal.insertarFinal(new Producto("Tango Glider Ball", 25, "Futbol clasico", null, 5, 100));
+
+        // 📌 Productos para el INVENTARIO DE LA TIENDA
+        System.out.println("\n🏬 Cargando inventario de la tienda...");
         tienda.agregarProductoInventario(new Producto("FIFA World Cup 26 Trionda Pro Ball", 170, "Futbol clasico", null, 0, 100));
         tienda.agregarProductoInventario(new Producto("FIFA World Cup 26 Trionda Competition Ball", 65, "Futbol clasico", null, 0, 100));
         tienda.agregarProductoInventario(new Producto("FIFA World Cup 26 Trionda Pro Beach Ball", 60, "Futbol playa", null, 0, 100));
         tienda.agregarProductoInventario(new Producto("Conext 25 League Ball", 40, "Futbol clasico", null, 0, 100));
         tienda.agregarProductoInventario(new Producto("Tango Glider Ball", 25, "Futbol clasico", null, 0, 100));
 
-        // Productos para la lista global
-        listaGlobal.insertarFinal(new Producto("FIFA World Cup 26 Trionda Pro Ball", 170, "Futbol clasico", null, 2, 100));
-        listaGlobal.insertarFinal(new Producto("Tango Glider Ball", 25, "Futbol clasico", null, 5, 100));
+        System.out.println("\n✅ Datos de ejemplo cargados exitosamente:");
+        System.out.println("   • Catálogo global: " + listaGlobal.obtenerTamano() + " productos");
+        System.out.println("   • Inventario tienda: " + contarProductosInventario(tienda.getInventario().getRaiz()) + " productos");
+    }
 
-        System.out.println("✅ Datos de ejemplo cargados exitosamente.");
+    private static int contarProductosInventario(Producto nodo) {
+        if (nodo == null) return 0;
+        return 1 + contarProductosInventario(nodo.getIzquierdo()) + contarProductosInventario(nodo.getDerecho());
     }
 
     public static void menuPrincipal() {
@@ -35,8 +52,8 @@ public class Main {
                 System.out.println("\n" + "═".repeat(50));
                 System.out.println("🏪  SISTEMA INTEGRADO DE GESTIÓN DE TIENDA  🏪");
                 System.out.println("═".repeat(50));
-                System.out.println("1. 📋  Gestión de Lista de Productos ");
-                System.out.println("2. 🏬  Gestión de Tienda Completa ");
+                System.out.println("1. 📋  Gestión de CATÁLOGO GLOBAL");
+                System.out.println("2. 🏬  Gestión de TIENDA");
                 System.out.println("3. 📊  Estado General del Sistema");
                 System.out.println("0. 🚪  Salir");
                 System.out.println("═".repeat(50));
@@ -75,16 +92,17 @@ public class Main {
         do {
             try {
                 System.out.println("\n" + "─".repeat(60));
-                System.out.println("📋  GESTIÓN DE LISTA DE PRODUCTOS ");
+                System.out.println("📋  GESTIÓN DE CATÁLOGO GLOBAL");
                 System.out.println("─".repeat(60));
-                System.out.println("1. ➕  Agregar producto al INICIO de la lista");
-                System.out.println("2. ➕  Agregar producto al FINAL de la lista");
-                System.out.println("3. 👁️  Mostrar TODOS los productos de la lista");
-                System.out.println("4. 🔍  Buscar producto por nombre");
-                System.out.println("5. 🗑️   Eliminar producto de la lista");
-                System.out.println("6. 📈  Imprimir REPORTE DE COSTOS de la lista");
+                System.out.println("1. ➕  Agregar producto al INICIO del catálogo");
+                System.out.println("2. ➕  Agregar producto al FINAL del catálogo");
+                System.out.println("3. 👁️  Mostrar TODOS los productos del catálogo");
+                System.out.println("4. 🔍  Buscar producto por nombre en catálogo");
+                System.out.println("5. 🗑️   Eliminar producto del catálogo");
+                System.out.println("6. 📈  Imprimir REPORTE DE COSTOS del catálogo");
                 System.out.println("7. 🖼️   Agregar imagen a producto existente");
                 System.out.println("8. 🔄  Cargar productos de ejemplo");
+                System.out.println("9. ⬇️  Importar producto al INVENTARIO de la tienda");
                 System.out.println("0. ↩️   Volver al menú principal");
                 System.out.println("─".repeat(60));
                 System.out.print("Seleccione una opción: ");
@@ -116,6 +134,9 @@ public class Main {
                     case 8:
                         cargarProductosEjemploLista();
                         break;
+                    case 9:
+                        importarProductoCatalogoInventario();
+                        break;
                     case 0:
                         System.out.println("↩️ Volviendo al menú principal...");
                         break;
@@ -134,7 +155,7 @@ public class Main {
         do {
             try {
                 System.out.println("\n" + "─".repeat(60));
-                System.out.println("🏬  GESTIÓN COMPLETA DE TIENDA ");
+                System.out.println("🏬  GESTIÓN COMPLETA DE TIENDA");
                 System.out.println("─".repeat(60));
                 System.out.println("1. 📦  Gestión de INVENTARIO");
                 System.out.println("2. 👥  Gestión de CLIENTES");
@@ -183,9 +204,10 @@ public class Main {
             System.out.println("📦  GESTIÓN DE INVENTARIO");
             System.out.println("─".repeat(50));
             System.out.println("1. ➕  Agregar producto al inventario");
-            System.out.println("2. 👁️  Mostrar inventario COMPLETO");
+            System.out.println("2. 👁️  Mostrar inventario COMPLETO (inorden)");
             System.out.println("3. 📋  Listar productos disponibles");
             System.out.println("4. 🔍  Buscar producto en inventario");
+            System.out.println("5. 📥  Importar desde catálogo global");
             System.out.println("0. ↩️   Volver al menú anterior");
             System.out.println("─".repeat(50));
             System.out.print("Seleccione una opción: ");
@@ -204,6 +226,9 @@ public class Main {
                     break;
                 case 4:
                     buscarProductoInventario();
+                    break;
+                case 5:
+                    importarProductoCatalogoInventario();
                     break;
                 case 0:
                     break;
@@ -250,9 +275,9 @@ public class Main {
         System.out.println("⭐".repeat(60));
 
         // Estado de la lista global
-        System.out.println("\n📋  LISTA GLOBAL DE PRODUCTOS:");
+        System.out.println("\n📋  CATÁLOGO GLOBAL DE PRODUCTOS:");
         if (listaGlobal.getPrimero() == null) {
-            System.out.println("   No hay productos en la lista global");
+            System.out.println("   No hay productos en el catálogo global");
         } else {
             System.out.println("   Total de productos: " + listaGlobal.obtenerTamano());
             listaGlobal.imprimirReporteCostos();
@@ -264,21 +289,21 @@ public class Main {
 
     // 🎯 MÉTODOS PARA GESTIÓN DE LISTA
     private static void agregarProductoInicio() throws IOException {
-        System.out.println("\n🎯 AGREGAR PRODUCTO AL INICIO DE LA LISTA");
+        System.out.println("\n🎯 AGREGAR PRODUCTO AL INICIO DEL CATÁLOGO");
         Producto producto = leerDatosProducto();
         listaGlobal.insertarInicio(producto);
-        System.out.println("✅ Producto agregado al INICIO de la lista exitosamente.");
+        System.out.println("✅ Producto agregado al INICIO del catálogo exitosamente.");
     }
 
     private static void agregarProductoFinal() throws IOException {
-        System.out.println("\n🎯 AGREGAR PRODUCTO AL FINAL DE LA LISTA");
+        System.out.println("\n🎯 AGREGAR PRODUCTO AL FINAL DEL CATÁLOGO");
         Producto producto = leerDatosProducto();
         listaGlobal.insertarFinal(producto);
-        System.out.println("✅ Producto agregado al FINAL de la lista exitosamente.");
+        System.out.println("✅ Producto agregado al FINAL del catálogo exitosamente.");
     }
 
     private static void buscarProductoLista() throws IOException {
-        System.out.print("\n🔍 Ingrese el nombre del producto a buscar: ");
+        System.out.print("\n🔍 Ingrese el nombre del producto a buscar en el catálogo: ");
         String nombre = reader.readLine();
         Producto producto = listaGlobal.buscarProducto(nombre);
         if (producto != null) {
@@ -287,13 +312,13 @@ public class Main {
     }
 
     private static void eliminarProductoLista() throws IOException {
-        System.out.print("\n🗑️  Ingrese el nombre del producto a eliminar: ");
+        System.out.print("\n🗑️  Ingrese el nombre del producto a eliminar del catálogo: ");
         String nombre = reader.readLine();
         listaGlobal.eliminarProducto(nombre);
     }
 
     private static void agregarImagenProductoLista() throws IOException {
-        System.out.print("\n🖼️  Ingrese el nombre del producto: ");
+        System.out.print("\n🖼️  Ingrese el nombre del producto del catálogo: ");
         String nombre = reader.readLine();
         Producto producto = listaGlobal.buscarProducto(nombre);
         if (producto != null) {
@@ -305,9 +330,11 @@ public class Main {
     }
 
     private static void cargarProductosEjemploLista() {
+        System.out.println("\n🔄 Cargando productos de ejemplo al catálogo...");
         listaGlobal.insertarFinal(new Producto("Balón de Práctica", 15, "Futbol", null, 10, 50));
         listaGlobal.insertarFinal(new Producto("Balón Profesional", 80, "Futbol", null, 3, 30));
-        System.out.println("✅ Productos de ejemplo cargados en la lista global.");
+        listaGlobal.insertarFinal(new Producto("Guantes Portero", 35, "Futbol", null, 4, 25));
+        System.out.println("✅ Productos de ejemplo cargados en el catálogo global.");
     }
 
     // 🏬 MÉTODOS PARA GESTIÓN DE TIENDA
@@ -318,7 +345,7 @@ public class Main {
     }
 
     private static void buscarProductoInventario() throws IOException {
-        System.out.print("\n🔍 Ingrese el nombre del producto a buscar: ");
+        System.out.print("\n🔍 Ingrese el nombre del producto a buscar en el inventario: ");
         String nombre = reader.readLine();
         Producto producto = tienda.buscarProductoInventario(nombre);
         if (producto != null) {
@@ -332,9 +359,42 @@ public class Main {
         tienda.crearClienteConCarrito();
     }
 
+    private static void importarProductoCatalogoInventario() throws IOException {
+        System.out.println("\n📥 IMPORTAR PRODUCTO DEL CATÁLOGO AL INVENTARIO");
 
+        if (listaGlobal.estaVacia()) {
+            System.out.println("❌ El catálogo global está vacío.");
+            return;
+        }
+
+        System.out.print("🔍 Nombre del producto a importar: ");
+        String nombre = reader.readLine();
+
+        Producto productoCopia = listaGlobal.obtenerCopiaParaInventario(nombre);
+
+        if (productoCopia != null) {
+            // Verificar si ya existe en inventario
+            Producto existente = tienda.buscarProductoInventario(nombre);
+            if (existente != null) {
+                System.out.print("⚠️  Producto ya existe en inventario. ¿Aumentar stock? (s/n): ");
+                String respuesta = reader.readLine();
+                if (respuesta.equalsIgnoreCase("s")) {
+                    existente.aumentarInventario(productoCopia.getInventario());
+                    System.out.println("✅ Stock aumentado en " + productoCopia.getInventario() + " unidades.");
+                } else {
+                    System.out.println("❌ Importación cancelada.");
+                }
+            } else {
+                // Agregar nuevo producto al inventario
+                tienda.agregarProductoInventario(productoCopia);
+                System.out.println("✅ Producto importado del catálogo al inventario.");
+            }
+        }
+    }
 
     private static void cargarDatosEjemploTienda() {
+        System.out.println("\n🔄 Cargando datos de ejemplo para la tienda...");
+
         // Agregar algunos clientes de ejemplo
         Cliente cliente1 = new Cliente("Juan Pérez", 1);
         cliente1.agregarAlCarrito(tienda.buscarProductoInventario("Tango Glider Ball"), 2);
@@ -345,11 +405,16 @@ public class Main {
         Cliente cliente3 = new Cliente("Carlos López", 3);
         cliente3.agregarAlCarrito(tienda.buscarProductoInventario("Conext 25 League Ball"), 3);
 
+        Cliente cliente4 = new Cliente("Ana Rodríguez", 3); // Premium
+        cliente4.agregarAlCarrito(tienda.buscarProductoInventario("FIFA World Cup 26 Trionda Pro Beach Ball"), 1);
+
         tienda.agregarCliente(cliente1);
         tienda.agregarCliente(cliente2);
         tienda.agregarCliente(cliente3);
+        tienda.agregarCliente(cliente4);
 
-        System.out.println("✅ Datos de ejemplo cargados en la tienda.");
+        System.out.println("✅ " + tienda.getColaClientes().obtenerTamanoTotal() + " clientes de ejemplo cargados en la tienda.");
+        System.out.println("   (Ordenados por prioridad: Premium > Afiliado > Básico)");
     }
 
     // MÉTODO COMPARTIDO PARA LEER DATOS DE PRODUCTO

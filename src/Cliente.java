@@ -3,12 +3,14 @@ import java.util.List;
 public class Cliente {
     private String nombre;
     private int prioridad; // 1: básico, 2: afiliado, 3: premium
-    private ShoppingCart carrito; // ✅ CAMBIO: Ahora usa ShoppingCart
+    private ShoppingCart carrito;
+    private Cliente siguiente; // ✅ NUEVO: Para la cola de prioridad
 
     public Cliente(String nombre, int prioridad) {
         this.nombre = nombre;
         this.prioridad = prioridad;
-        this.carrito = new ShoppingCart(); // ✅ CAMBIO
+        this.carrito = new ShoppingCart();
+        this.siguiente = null; // ✅ NUEVO
     }
 
     // Getters y Setters
@@ -22,19 +24,20 @@ public class Cliente {
         }
     }
 
-    public ShoppingCart getCarrito() { return carrito; } // ✅ CAMBIO
+    public ShoppingCart getCarrito() { return carrito; }
+    public void setCarrito(ShoppingCart carrito) { this.carrito = carrito; } // ✅ NUEVO
 
-    // ✅ MÉTODO MODIFICADO: Ahora usa ShoppingCart
+    public Cliente getSiguiente() { return siguiente; } // ✅ NUEVO
+    public void setSiguiente(Cliente siguiente) { this.siguiente = siguiente; } // ✅ NUEVO
+
     public void agregarAlCarrito(Producto producto, int cantidad) {
         carrito.addProduct(producto, cantidad);
     }
 
-    // ✅ MÉTODO MODIFICADO: Calcular total del carrito
     public double calcularTotalCarrito() {
         return carrito.subtotal();
     }
 
-    // ✅ MÉTODO MEJORADO: Mostrar factura con formato mejorado
     public void mostrarFactura() {
         System.out.println("\n" + "═".repeat(60));
         System.out.println("🎫 FACTURA - " + nombre.toUpperCase());
@@ -78,7 +81,6 @@ public class Cliente {
         }
     }
 
-    // ✅ NUEVO: Método para calcular costo de envío según prioridad
     private double getCostoEnvio() {
         switch (prioridad) {
             case 3: return 0.0;    // Premium: envío gratis
@@ -97,12 +99,10 @@ public class Cliente {
         }
     }
 
-    // ✅ MÉTODO MODIFICADO: Vaciar carrito
     public void vaciarCarrito() {
         this.carrito.clear();
     }
 
-    // ✅ NUEVO: Método para gestionar carrito interactivamente
     public void gestionarCarritoInteractivo(Tienda tienda) {
         try {
             java.io.BufferedReader reader = new java.io.BufferedReader(
@@ -161,7 +161,6 @@ public class Cliente {
             int cantidad = Integer.parseInt(reader.readLine());
 
             if (cantidad > 0 && cantidad <= producto.getInventario()) {
-                // Verificar si ya está en el carrito
                 int cantidadExistente = carrito.getProductQuantity(nombreProducto);
                 int totalRequerido = cantidadExistente + cantidad;
 

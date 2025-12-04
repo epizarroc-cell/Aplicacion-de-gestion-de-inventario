@@ -19,7 +19,7 @@ public class Tienda {
     // Agregar producto al inventario
     public void agregarProductoInventario(Producto producto) {
         inventario.insertar(producto);
-        System.out.println("✅ Producto '" + producto.getNombre() + "' agregado al inventario.");
+        System.out.println("✅ Producto '" + producto.getNombre() + "' agregado al inventario (Árbol binario).");
     }
 
     // Buscar producto en inventario
@@ -89,7 +89,7 @@ public class Tienda {
         System.out.println("🏪".repeat(60));
 
         // Estado del inventario
-        System.out.println("\n📦 INVENTARIO:");
+        System.out.println("\n📦 INVENTARIO (Árbol binario):");
         if (inventario.estaVacio()) {
             System.out.println("   No hay productos en el inventario.");
         } else {
@@ -124,10 +124,10 @@ public class Tienda {
             System.out.print("👤 Nombre del cliente: ");
             String nombreCliente = reader.readLine();
 
-            System.out.println("\n🎯 Tipo de cliente:");
-            System.out.println("   1 - 🟢 Básico");
-            System.out.println("   2 - 🟡 Afiliado");
-            System.out.println("   3 - 🔴 Premium");
+            System.out.println("\n🎯 Tipo de cliente (Cola de prioridad):");
+            System.out.println("   1 - 🟢 Básico (Prioridad baja)");
+            System.out.println("   2 - 🟡 Afiliado (Prioridad media)");
+            System.out.println("   3 - 🔴 Premium (Prioridad alta)");
             System.out.print("   Seleccione (1-3): ");
 
             int prioridad = Integer.parseInt(reader.readLine());
@@ -143,6 +143,7 @@ public class Tienda {
 
             // Agregar cliente a la cola
             agregarCliente(cliente);
+            System.out.println("✅ Cliente agregado a la cola de prioridad.");
 
         } catch (Exception e) {
             System.out.println("❌ Error al crear cliente: " + e.getMessage());
