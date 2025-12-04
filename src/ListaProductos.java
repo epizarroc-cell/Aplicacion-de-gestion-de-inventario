@@ -1,4 +1,3 @@
-
 public class ListaProductos {
     private Producto primero;
 
@@ -37,34 +36,34 @@ public class ListaProductos {
     // Buscar producto por nombre
     public Producto buscarProducto(String nombreBuscar) {
         if (primero == null) {
-            System.out.println("El catálogo global se encuentra vacío.");
+            System.out.println("La lista se encuentra vacía.");
             return null;
         }
 
         Producto productoTemp = primero;
         while (productoTemp != null) {
             if (productoTemp.getNombre().equalsIgnoreCase(nombreBuscar)) {
-                System.out.println("✅ Producto encontrado en el catálogo global.");
+                System.out.println("El producto se encontró en la estructura.");
                 return productoTemp;
             }
             productoTemp = productoTemp.getSiguiente();
         }
 
-        System.out.println("❌ Producto no encontrado en el catálogo global.");
+        System.out.println("El producto buscado no se encontró en la estructura.");
         return null;
     }
 
     // Eliminar producto por nombre
     public boolean eliminarProducto(String nombreEliminar) {
         if (primero == null) {
-            System.out.println("El catálogo está vacío.");
+            System.out.println("La lista está vacía.");
             return false;
         }
 
         // Caso especial: eliminar el primer nodo
         if (primero.getNombre().equalsIgnoreCase(nombreEliminar)) {
             primero = primero.getSiguiente();
-            System.out.println("✅ Producto eliminado del catálogo global.");
+            System.out.println("Producto eliminado exitosamente.");
             return true;
         }
 
@@ -78,27 +77,24 @@ public class ListaProductos {
         }
 
         if (productoTemp == null) {
-            System.out.println("❌ Producto no encontrado en el catálogo.");
+            System.out.println("Producto no encontrado.");
             return false;
         }
 
         anterior.setSiguiente(productoTemp.getSiguiente());
-        System.out.println("✅ Producto eliminado del catálogo global.");
+        System.out.println("Producto eliminado exitosamente.");
         return true;
     }
 
     // Mostrar todos los productos
     public void mostrarTodosProductos() {
         if (primero == null) {
-            System.out.println("📭 El catálogo global está vacío.");
+            System.out.println("No hay productos en la lista.");
             return;
         }
 
         Producto productoTemp = primero;
         int contador = 1;
-
-        System.out.println("\n📋 CATÁLOGO GLOBAL DE PRODUCTOS");
-        System.out.println("═".repeat(50));
 
         while (productoTemp != null) {
             System.out.println("\nProducto #" + contador + ":");
@@ -106,15 +102,12 @@ public class ListaProductos {
             productoTemp = productoTemp.getSiguiente();
             contador++;
         }
-
-        System.out.println("═".repeat(50));
-        System.out.println("📊 Total de productos en catálogo: " + (contador-1));
     }
 
     // Reporte de costos totales
     public void imprimirReporteCostos() {
         if (primero == null) {
-            System.out.println("📭 No hay productos en el catálogo.");
+            System.out.println("No hay productos en la lista.");
             return;
         }
 
@@ -122,26 +115,23 @@ public class ListaProductos {
         double costoTotalAcumulado = 0;
         int contador = 1;
 
-        System.out.println("\n📊 REPORTE DE COSTOS - CATÁLOGO GLOBAL");
-        System.out.println("═".repeat(60));
+        System.out.println("\n=== REPORTE DE COSTOS ===");
         while (productoTemp != null) {
             double costoProducto = productoTemp.calcularCostoTotal();
             costoTotalAcumulado += costoProducto;
 
-            System.out.printf("%2d. %-35s | Cant: %-3d | Unit: $%-6.2f | Total: $%-8.2f\n",
-                    contador,
-                    productoTemp.getNombre(),
-                    productoTemp.getCantidad(),
-                    productoTemp.getPrecio(),
-                    costoProducto);
+            System.out.println(contador + ". " + productoTemp.getNombre() +
+                    " | Cantidad: " + productoTemp.getCantidad() +
+                    " | Costo unitario: $" + productoTemp.getPrecio() +
+                    " | Costo total: $" + costoProducto);
 
             productoTemp = productoTemp.getSiguiente();
             contador++;
         }
 
-        System.out.println("─".repeat(60));
-        System.out.printf("💰 COSTO TOTAL ACUMULADO: $%.2f\n", costoTotalAcumulado);
-        System.out.println("═".repeat(60));
+        System.out.println("-----------------------------------");
+        System.out.println("COSTO TOTAL ACUMULADO: $" + costoTotalAcumulado);
+        System.out.println("===================================");
     }
 
     // Método para calcular total del carrito
@@ -184,7 +174,8 @@ public class ListaProductos {
                     original.getCategoria(),
                     original.getFechaVencimiento(),
                     0, // cantidad en carrito comienza en 0
-                    original.getInventario()
+                    original.getInventario(),
+                    original.getUbicacion() // ✅ Añadido ubicación
             );
         }
         return null;

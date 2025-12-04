@@ -1,172 +1,111 @@
-/**
- * Los clientes se almacenan en orden de prioridad (3 > 2 > 1).
- */
+import java.util.LinkedList;
+import java.util.Queue;
+
 public class ColaClientes {
-    private Cliente primero;
-    private Cliente ultimo;
-    private int tamaño;
+    private Queue<Cliente> colaPrioridad1;
+    private Queue<Cliente> colaPrioridad2;
+    private Queue<Cliente> colaPrioridad3;
 
     public ColaClientes() {
-        primero = null;
-        ultimo = null;
-        tamaño = 0;
+        colaPrioridad1 = new LinkedList<>();
+        colaPrioridad2 = new LinkedList<>();
+        colaPrioridad3 = new LinkedList<>();
     }
 
-    /**
-     * Encolar un cliente manteniendo el orden por prioridad.
-     * Prioridad 3 (Premium) tiene la mayor prioridad, 1 (Básico) la menor.
-     */
+    // Agregar cliente a la cola según su prioridad
     public void encolar(Cliente cliente) {
-        Cliente nuevo = new Cliente(cliente.getNombre(), cliente.getPrioridad());
-        nuevo.setCarrito(cliente.getCarrito());
-
-        if (primero == null) {
-            // Cola vacía
-            primero = nuevo;
-            ultimo = nuevo;
-        } else {
-            // Insertar según prioridad (de mayor a menor: 3, 2, 1)
-            if (cliente.getPrioridad() == 3) {
-                // Premium va al frente si es necesario
-                if (primero.getPrioridad() < 3) {
-                    nuevo.setSiguiente(primero);
-                    primero = nuevo;
-                } else {
-                    // Buscar posición correcta para premium
-                    insertarOrdenadoPorPrioridad(nuevo);
-                }
-            } else if (cliente.getPrioridad() == 2) {
-                insertarOrdenadoPorPrioridad(nuevo);
-            } else {
-                // Prioridad 1 va al final
-                ultimo.setSiguiente(nuevo);
-                ultimo = nuevo;
-            }
+        switch (cliente.getPrioridad()) {
+            case 1:
+                colaPrioridad1.offer(cliente);
+                break;
+            case 2:
+                colaPrioridad2.offer(cliente);
+                break;
+            case 3:
+                colaPrioridad3.offer(cliente);
+                break;
+            default:
+                System.out.println("Prioridad no válida");
         }
-        tamaño++;
         System.out.println("✅ Cliente " + cliente.getNombre() + " agregado a la cola (" + cliente.getTipoCliente() + ")");
     }
 
-    /**
-     * Inserta un cliente en la posición correcta según su prioridad.
-     * Los clientes con mayor prioridad van primero.
-     */
-    private void insertarOrdenadoPorPrioridad(Cliente nuevo) {
-        Cliente actual = primero;
-        Cliente anterior = null;
+    // Verificar conectividad antes de atender
+    public Cliente atenderSiguiente(Grafo grafo) {
+        Cliente cliente = null;
 
-        while (actual != null && actual.getPrioridad() >= nuevo.getPrioridad()) {
-            anterior = actual;
-            actual = actual.getSiguiente();
+        // Buscar cliente según prioridad
+        if (!colaPrioridad3.isEmpty()) {
+            cliente = colaPrioridad3.peek();
+        } else if (!colaPrioridad2.isEmpty()) {
+            cliente = colaPrioridad2.peek();
+        } else if (!colaPrioridad1.isEmpty()) {
+            cliente = colaPrioridad1.peek();
         }
 
-        if (anterior == null) {
-            // Insertar al inicio
-            nuevo.setSiguiente(primero);
-            primero = nuevo;
-        } else {
-            // Insertar en medio
-            anterior.setSiguiente(nuevo);
-            nuevo.setSiguiente(actual);
-
-            if (actual == null) {
-                ultimo = nuevo;
-            }
-        }
-    }
-
-    /**
-     * Atiende al siguiente cliente (siempre el primero en la cola).
-     * Retorna null si la cola está vacía.
-     */
-    public Cliente atenderSiguiente() {
-        if (primero == null) {
+        if (cliente == null) {
             System.out.println("❌ No hay clientes en la cola");
             return null;
         }
 
-        Cliente atendido = primero;
-        primero = primero.getSiguiente();
+        // Verificar si la ubicación del cliente está conectada
+        if (!grafo.estaConectado(cliente.getUbicacion())) {
+            System.out.println("❌ No se puede atender al cliente " + cliente.getNombre() +
+                    ". Su ubicación '" + cliente.getUbicacion() +
+                    "' no está conectada a la red de entrega.");
 
-        if (primero == null) {
-            ultimo = null;
-        }
-
-        tamaño--;
-        System.out.println("🎯 Atendiendo a: " + atendido.getNombre() + " (" + atendido.getTipoCliente() + ")");
-        return atendido;
-    }
-
-    /**
-     * Verifica si la cola está vacía.
-     */
-    public boolean estaVacia() {
-        return primero == null;
-    }
-
-    /**
-     * Muestra el estado actual de la cola.
-     */
-    public void mostrarEstadoCola() {
-        System.out.println("\n=== ESTADO DE LA COLA ===");
-
-        if (primero == null) {
-            System.out.println("La cola está vacía.");
-            return;
-        }
-
-        System.out.println("📊 Total de clientes en espera: " + tamaño);
-        System.out.println("\n👉 Orden de atención (de primero a último):");
-
-        Cliente actual = primero;
-        int contador = 1;
-        int premium = 0, afiliado = 0, basico = 0;
-
-        while (actual != null) {
-            System.out.printf("%d. %-20s - %s\n",
-                    contador,
-                    actual.getNombre(),
-                    actual.getTipoCliente());
-
-            // Contar por tipo
-            switch (actual.getPrioridad()) {
-                case 3: premium++; break;
-                case 2: afiliado++; break;
-                case 1: basico++; break;
+            // Remover cliente de la cola (no se puede atender)
+            if (!colaPrioridad3.isEmpty()) {
+                colaPrioridad3.poll();
+            } else if (!colaPrioridad2.isEmpty()) {
+                colaPrioridad2.poll();
+            } else if (!colaPrioridad1.isEmpty()) {
+                colaPrioridad1.poll();
             }
 
-            actual = actual.getSiguiente();
-            contador++;
+            return null;
         }
 
-        System.out.println("\n📈 Distribución por tipo:");
-        System.out.println("🔴 Clientes Premium (Prioridad 3): " + premium);
-        System.out.println("🟡 Clientes Afiliados (Prioridad 2): " + afiliado);
-        System.out.println("🟢 Clientes Básicos (Prioridad 1): " + basico);
+        // Atender cliente normalmente
+        if (!colaPrioridad3.isEmpty()) {
+            return colaPrioridad3.poll();
+        } else if (!colaPrioridad2.isEmpty()) {
+            return colaPrioridad2.poll();
+        } else if (!colaPrioridad1.isEmpty()) {
+            return colaPrioridad1.poll();
+        }
 
-        if (primero != null) {
-            System.out.println("\n⏭️  Próximo cliente: " + primero.getNombre() + " (" + primero.getTipoCliente() + ")");
+        return null;
+    }
+
+    // Verificar si la cola está vacía
+    public boolean estaVacia() {
+        return colaPrioridad1.isEmpty() && colaPrioridad2.isEmpty() && colaPrioridad3.isEmpty();
+    }
+
+    // Mostrar estado de la cola
+    public void mostrarEstadoCola() {
+        System.out.println("\n=== ESTADO DE LA COLA ===");
+        System.out.println("🔴 Clientes Premium (Prioridad 3): " + colaPrioridad3.size());
+        System.out.println("🟡 Clientes Afiliados (Prioridad 2): " + colaPrioridad2.size());
+        System.out.println("🟢 Clientes Básicos (Prioridad 1): " + colaPrioridad1.size());
+        System.out.println("📊 Total de clientes en espera: " + (colaPrioridad1.size() + colaPrioridad2.size() + colaPrioridad3.size()));
+
+        // Mostrar próximos clientes a atender
+        if (!colaPrioridad3.isEmpty()) {
+            Cliente proximo = colaPrioridad3.peek();
+            System.out.println("⏭️  Próximo cliente Premium: " + proximo.getNombre() + " (📍 " + proximo.getUbicacion() + ")");
+        } else if (!colaPrioridad2.isEmpty()) {
+            Cliente proximo = colaPrioridad2.peek();
+            System.out.println("⏭️  Próximo cliente Afiliado: " + proximo.getNombre() + " (📍 " + proximo.getUbicacion() + ")");
+        } else if (!colaPrioridad1.isEmpty()) {
+            Cliente proximo = colaPrioridad1.peek();
+            System.out.println("⏭️  Próximo cliente Básico: " + proximo.getNombre() + " (📍 " + proximo.getUbicacion() + ")");
         }
     }
 
-    /**
-     * Retorna el tamaño total de la cola.
-     */
+    // Obtener tamaño total de la colas
     public int obtenerTamanoTotal() {
-        return tamaño;
-    }
-
-    /**
-     * Retorna el primer cliente sin atenderlo.
-     */
-    public Cliente getPrimero() {
-        return primero;
-    }
-
-    /**
-     * Retorna el último cliente en la cola.
-     */
-    public Cliente getUltimo() {
-        return ultimo;
+        return colaPrioridad1.size() + colaPrioridad2.size() + colaPrioridad3.size();
     }
 }

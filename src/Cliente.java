@@ -2,15 +2,17 @@ import java.util.List;
 
 public class Cliente {
     private String nombre;
-    private int prioridad; // 1: básico, 2: afiliado, 3: premium
+    private int prioridad;
+    private String ubicacion; // Nuevo atributo
     private ShoppingCart carrito;
-    private Cliente siguiente; // ✅ NUEVO: Para la cola de prioridad
+    private Cliente siguiente;
 
-    public Cliente(String nombre, int prioridad) {
+    public Cliente(String nombre, int prioridad, String ubicacion) {
         this.nombre = nombre;
         this.prioridad = prioridad;
+        this.ubicacion = ubicacion;
         this.carrito = new ShoppingCart();
-        this.siguiente = null; // ✅ NUEVO
+        this.siguiente = null;
     }
 
     // Getters y Setters
@@ -24,11 +26,14 @@ public class Cliente {
         }
     }
 
-    public ShoppingCart getCarrito() { return carrito; }
-    public void setCarrito(ShoppingCart carrito) { this.carrito = carrito; } // ✅ NUEVO
+    public String getUbicacion() { return ubicacion; }
+    public void setUbicacion(String ubicacion) { this.ubicacion = ubicacion; }
 
-    public Cliente getSiguiente() { return siguiente; } // ✅ NUEVO
-    public void setSiguiente(Cliente siguiente) { this.siguiente = siguiente; } // ✅ NUEVO
+    public ShoppingCart getCarrito() { return carrito; }
+    public void setCarrito(ShoppingCart carrito) { this.carrito = carrito; }
+
+    public Cliente getSiguiente() { return siguiente; }
+    public void setSiguiente(Cliente siguiente) { this.siguiente = siguiente; }
 
     public void agregarAlCarrito(Producto producto, int cantidad) {
         carrito.addProduct(producto, cantidad);
@@ -38,12 +43,13 @@ public class Cliente {
         return carrito.subtotal();
     }
 
-    public void mostrarFactura() {
+    public void mostrarFactura(Grafo grafo) {
         System.out.println("\n" + "═".repeat(60));
         System.out.println("🎫 FACTURA - " + nombre.toUpperCase());
         System.out.println("═".repeat(60));
         System.out.println("👤 Cliente: " + nombre);
         System.out.println("🎯 Tipo: " + getTipoCliente());
+        System.out.println("📍 Ubicación: " + ubicacion);
         System.out.println("📦 Productos en carrito: " + carrito.getItemCount());
 
         if (carrito.isEmpty()) {
@@ -65,9 +71,8 @@ public class Cliente {
                         item.lineTotal());
             }
 
-            // Cálculos de impuestos y total
             double subtotal = carrito.subtotal();
-            double iva = carrito.taxes(0.13); // 13% de IVA
+            double iva = carrito.taxes(0.13);
             double envio = getCostoEnvio();
             double total = subtotal + iva + envio;
 
@@ -79,13 +84,29 @@ public class Cliente {
             System.out.printf("%45s: $%8.2f\n", "TOTAL A PAGAR", total);
             System.out.println("═".repeat(60));
         }
+
+        // Mostrar ruta de entrega si hay un grafo disponible
+        if (grafo != null) {
+            mostrarRutaEntrega(grafo);
+        }
+    }
+
+
+    // Nuevo método para mostrar ruta de entrega
+    private void mostrarRutaEntrega(Grafo grafo) {
+        System.out.println("\n🚚 INFORMACIÓN DE ENTREGA");
+        System.out.println("─".repeat(40));
+
+        String ruta = grafo.calcularRutaOptima("San José", this.ubicacion);
+        System.out.println(ruta);
+        System.out.println("─".repeat(40));
     }
 
     private double getCostoEnvio() {
         switch (prioridad) {
-            case 3: return 0.0;    // Premium: envío gratis
-            case 2: return 2.0;    // Afiliado: envío con descuento
-            case 1: return 5.0;    // Básico: envío estándar
+            case 3: return 0.0;
+            case 2: return 2.0;
+            case 1: return 5.0;
             default: return 5.0;
         }
     }
@@ -103,7 +124,9 @@ public class Cliente {
         this.carrito.clear();
     }
 
+    // Métodos existentes (se mantienen igual, solo se actualiza el método que recibe Tienda)
     public void gestionarCarritoInteractivo(Tienda tienda) {
+        // ... código existente sin cambios ...
         try {
             java.io.BufferedReader reader = new java.io.BufferedReader(
                     new java.io.InputStreamReader(System.in));

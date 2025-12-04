@@ -19,7 +19,7 @@ public class Tienda {
     // Agregar producto al inventario
     public void agregarProductoInventario(Producto producto) {
         inventario.insertar(producto);
-        System.out.println("✅ Producto '" + producto.getNombre() + "' agregado al inventario (Árbol binario).");
+        System.out.println("✅ Producto '" + producto.getNombre() + "' agregado al inventario.");
     }
 
     // Buscar producto en inventario
@@ -42,16 +42,16 @@ public class Tienda {
         colaClientes.encolar(cliente);
     }
 
-    // ✅ MÉTODO MEJORADO: Atender siguiente cliente
-    public void atenderSiguienteCliente() {
-        Cliente cliente = colaClientes.atenderSiguiente();
+    // Método actualizado para atender cliente con grafo
+    public void atenderSiguienteCliente(Grafo grafo) {
+        Cliente cliente = colaClientes.atenderSiguiente(grafo);
         if (cliente != null) {
             System.out.println("\n" + "⭐".repeat(60));
             System.out.println("🎉 ATENDIENDO A CLIENTE: " + cliente.getNombre().toUpperCase());
             System.out.println("⭐".repeat(60));
 
-            // Mostrar factura detallada
-            cliente.mostrarFactura();
+            // Mostrar factura detallada con ruta
+            cliente.mostrarFactura(grafo);
 
             // Actualizar inventario después de la compra
             actualizarInventario(cliente);
@@ -60,7 +60,7 @@ public class Tienda {
         }
     }
 
-    // ✅ MÉTODO MEJORADO: Actualizar inventario después de una compra
+    // Método para actualizar inventario después de una compra
     private void actualizarInventario(Cliente cliente) {
         List<CartItem> items = cliente.getCarrito().getItems();
         for (CartItem item : items) {
@@ -89,7 +89,7 @@ public class Tienda {
         System.out.println("🏪".repeat(60));
 
         // Estado del inventario
-        System.out.println("\n📦 INVENTARIO (Árbol binario):");
+        System.out.println("\n📦 INVENTARIO:");
         if (inventario.estaVacio()) {
             System.out.println("   No hay productos en el inventario.");
         } else {
@@ -114,8 +114,8 @@ public class Tienda {
         return producto != null && producto.haySuficienteInventario(cantidad);
     }
 
-    // ✅ NUEVO: Método para crear cliente con gestión interactiva de carrito
-    public void crearClienteConCarrito() {
+    // Método para crear cliente con grafo
+    public void crearClienteConCarrito(Grafo grafo) {
         try {
             java.io.BufferedReader reader = new java.io.BufferedReader(
                     new java.io.InputStreamReader(System.in));
@@ -124,10 +124,13 @@ public class Tienda {
             System.out.print("👤 Nombre del cliente: ");
             String nombreCliente = reader.readLine();
 
-            System.out.println("\n🎯 Tipo de cliente (Cola de prioridad):");
-            System.out.println("   1 - 🟢 Básico (Prioridad baja)");
-            System.out.println("   2 - 🟡 Afiliado (Prioridad media)");
-            System.out.println("   3 - 🔴 Premium (Prioridad alta)");
+            System.out.print("📍 Ubicación del cliente: ");
+            String ubicacionCliente = reader.readLine();
+
+            System.out.println("\n🎯 Tipo de cliente:");
+            System.out.println("   1 - 🟢 Básico");
+            System.out.println("   2 - 🟡 Afiliado");
+            System.out.println("   3 - 🔴 Premium");
             System.out.print("   Seleccione (1-3): ");
 
             int prioridad = Integer.parseInt(reader.readLine());
@@ -136,14 +139,28 @@ public class Tienda {
                 prioridad = 1;
             }
 
-            Cliente cliente = new Cliente(nombreCliente, prioridad);
+            Cliente cliente = new Cliente(nombreCliente, prioridad, ubicacionCliente);
 
             // Gestión interactiva del carrito
             cliente.gestionarCarritoInteractivo(this);
 
             // Agregar cliente a la cola
             agregarCliente(cliente);
-            System.out.println("✅ Cliente agregado a la cola de prioridad.");
+
+            // Si la ubicación no está conectada, ofrecer conectar
+            if (!grafo.existeVertice(ubicacionCliente)) {
+                System.out.println("\nℹ️  La ubicación '" + ubicacionCliente + "' es nueva en el sistema.");
+                System.out.print("¿Desea conectarla a San José para entregas? (s/n): ");
+                String respuesta = reader.readLine();
+                if (respuesta.equalsIgnoreCase("s")) {
+                    System.out.print("📏 Distancia desde San José (km): ");
+                    int distancia = Integer.parseInt(reader.readLine());
+                    grafo.agregarArista("San José", ubicacionCliente, distancia);
+                    System.out.println("✅ Ubicación conectada al sistema de entregas.");
+                } else {
+                    System.out.println("⚠️  El cliente podrá tener problemas de entrega si no está conectado.");
+                }
+            }
 
         } catch (Exception e) {
             System.out.println("❌ Error al crear cliente: " + e.getMessage());

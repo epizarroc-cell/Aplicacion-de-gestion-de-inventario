@@ -1,35 +1,39 @@
 import java.util.ArrayList;
 
 public class Producto {
-    // Atributos principales
     private String nombre;
     private double precio;
     private String categoria;
-    private String fechaVencimiento; // puede ser null si no aplica
-    private int cantidad;            // cantidad que se maneja en el carrito
-    private int inventario;          // cantidad en inventario de la tienda
-    private ArrayList<String> listaImagenes; // rutas de imágenes del producto
+    private String fechaVencimiento;
+    private int cantidad;
+    private int inventario;
+    private String ubicacion;
+    private ArrayList<String> listaImagenes;
+    private Producto siguiente;
+    private Producto izquierdo;
+    private Producto derecho;
 
-    // Atributos para funcionalidad de nodo (reemplaza NodoProducto)
-    private Producto siguiente;      // referencia al siguiente producto en la lista
-    private Producto izquierdo;      // referencia izquierda para árbol
-    private Producto derecho;        // referencia derecha para árbol
-
-    // Constructor básico
-    public Producto(String nombre, double precio, String categoria, String fechaVencimiento, int cantidad, int inventario) {
+    // Constructor actualizado con ubicación
+    public Producto(String nombre, double precio, String categoria, String fechaVencimiento, int cantidad, int inventario, String ubicacion) {
         this.nombre = nombre;
         this.precio = precio;
         this.categoria = categoria;
         this.fechaVencimiento = fechaVencimiento;
         this.cantidad = cantidad;
         this.inventario = inventario;
+        this.ubicacion = ubicacion;
         this.listaImagenes = new ArrayList<>();
         this.siguiente = null;
         this.izquierdo = null;
         this.derecho = null;
     }
 
-    // Constructor de copia (útil para carrito de compras)
+    // Constructor sobrecargado para compatibilidad (sin ubicación)
+    public Producto(String nombre, double precio, String categoria, String fechaVencimiento, int cantidad, int inventario) {
+        this(nombre, precio, categoria, fechaVencimiento, cantidad, inventario, "Sin ubicación");
+    }
+
+    // Constructor de copia
     public Producto(Producto original, int cantidadCarrito) {
         this.nombre = original.nombre;
         this.precio = original.precio;
@@ -37,13 +41,14 @@ public class Producto {
         this.fechaVencimiento = original.fechaVencimiento;
         this.cantidad = cantidadCarrito;
         this.inventario = original.inventario;
+        this.ubicacion = original.ubicacion;
         this.listaImagenes = new ArrayList<>(original.listaImagenes);
         this.siguiente = null;
         this.izquierdo = null;
         this.derecho = null;
     }
 
-    // Getters y Setters básicos
+    // Getters y Setters
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
 
@@ -62,34 +67,30 @@ public class Producto {
     public int getInventario() { return inventario; }
     public void setInventario(int inventario) { this.inventario = inventario; }
 
-    public ArrayList<String> getListaImagenes() { return listaImagenes; }
+    public String getUbicacion() { return ubicacion; }
+    public void setUbicacion(String ubicacion) { this.ubicacion = ubicacion; }
 
-    // Getters y Setters para funcionalidad de nodo
+    public ArrayList<String> getListaImagenes() { return listaImagenes; }
     public Producto getSiguiente() { return siguiente; }
     public void setSiguiente(Producto siguiente) { this.siguiente = siguiente; }
-
     public Producto getIzquierdo() { return izquierdo; }
     public void setIzquierdo(Producto izquierdo) { this.izquierdo = izquierdo; }
-
     public Producto getDerecho() { return derecho; }
     public void setDerecho(Producto derecho) { this.derecho = derecho; }
 
-    // Método para añadir imágenes
+    // Resto de los métodos se mantienen igual...
     public void agregarImagen(String rutaImagen) {
         listaImagenes.add(rutaImagen);
     }
 
-    // Método para calcular el costo total de este producto según la cantidad
     public double calcularCostoTotal() {
         return cantidad * precio;
     }
 
-    // Método para verificar disponibilidad en inventario
     public boolean haySuficienteInventario(int cantidadRequerida) {
         return inventario >= cantidadRequerida;
     }
 
-    // Método para reducir inventario
     public boolean reducirInventario(int cantidad) {
         if (haySuficienteInventario(cantidad)) {
             this.inventario -= cantidad;
@@ -98,27 +99,24 @@ public class Producto {
         return false;
     }
 
-    // Método para aumentar inventario
     public void aumentarInventario(int cantidad) {
         this.inventario += cantidad;
     }
 
-    // Método para mostrar información básica (para listados)
     public void mostrarInfoBasica() {
-        System.out.println("- " + nombre + " | $" + precio + " | Stock: " + inventario + " | Categoría: " + categoria);
+        System.out.println("- " + nombre + " | $" + precio + " | Stock: " + inventario + " | Categoría: " + categoria + " | Ubicación: " + ubicacion);
     }
 
-    // Método para mostrar información de carrito
     public void mostrarInfoCarrito() {
         System.out.println("- " + nombre + " | $" + precio + " | Cantidad: " + cantidad + " | Subtotal: $" + calcularCostoTotal());
     }
 
-    // Método para mostrar información completa del producto
     public void mostrarProducto() {
         System.out.println("=== Producto ===");
         System.out.println("Nombre: " + nombre);
         System.out.println("Precio: $" + precio);
         System.out.println("Categoría: " + categoria);
+        System.out.println("Ubicación: " + ubicacion);
         if (fechaVencimiento != null) {
             System.out.println("Fecha de Vencimiento: " + fechaVencimiento);
         } else {
@@ -131,23 +129,19 @@ public class Producto {
         System.out.println("===================");
     }
 
-    // Método para comparar productos (útil para árbol binario)
     public int compararCon(Producto otro) {
         return this.nombre.compareToIgnoreCase(otro.nombre);
     }
 
-    // Método para verificar si es hoja en el árbol
     public boolean esHoja() {
         return izquierdo == null && derecho == null;
     }
 
-    // Método toString para representación básica
     @Override
     public String toString() {
-        return nombre + " - $" + precio + " (Stock: " + inventario + ")";
+        return nombre + " - $" + precio + " (Stock: " + inventario + ") Ubicación: " + ubicacion;
     }
 
-    // Método para crear copia para carrito
     public Producto crearCopiaParaCarrito(int cantidadCarrito) {
         return new Producto(this, cantidadCarrito);
     }

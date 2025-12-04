@@ -1,48 +1,45 @@
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.util.*;
 
 public class Main {
     private static Tienda tienda = new Tienda("Mi Tienda Deportiva");
     private static ListaProductos listaGlobal = new ListaProductos();
+    private static Grafo grafoUbicaciones = new Grafo();
     private static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
     public static void main(String[] args) {
-        System.out.println("🚀 INICIANDO SISTEMA DE GESTIÓN DE TIENDA...");
-        System.out.println("📦 Cargando estructuras de datos:");
-        System.out.println("   • Árbol binario (Inventario)");
-        System.out.println("   • Lista enlazada (Catálogo global)");
-        System.out.println("   • Cola de prioridad (Clientes)");
-        System.out.println("   • ShoppingCart (Carritos de compra)");
-
+        System.out.println("🚀 INICIANDO SISTEMA DE GESTIÓN DE TIENDA CON ENTREGAS...");
         inicializarDatosEjemplo();
         menuPrincipal();
     }
 
     private static void inicializarDatosEjemplo() {
-        System.out.println("\n📦 Inicializando datos de ejemplo...");
+        // Productos para el inventario de la tienda
+        tienda.agregarProductoInventario(new Producto("FIFA World Cup 26 Trionda Pro Ball", 170, "Futbol clasico", null, 0, 100, "San José"));
+        tienda.agregarProductoInventario(new Producto("FIFA World Cup 26 Trionda Competition Ball", 65, "Futbol clasico", null, 0, 100, "San José"));
+        tienda.agregarProductoInventario(new Producto("FIFA World Cup 26 Trionda Pro Beach Ball", 60, "Futbol playa", null, 0, 100, "San José"));
+        tienda.agregarProductoInventario(new Producto("Conext 25 League Ball", 40, "Futbol clasico", null, 0, 100, "San José"));
+        tienda.agregarProductoInventario(new Producto("Tango Glider Ball", 25, "Futbol clasico", null, 0, 100, "San José"));
 
-        // 📌 Productos para la LISTA GLOBAL (catálogo general)
-        System.out.println("\n📋 Cargando catálogo global de productos...");
-        listaGlobal.insertarFinal(new Producto("FIFA World Cup 26 Trionda Pro Ball", 170, "Futbol clasico", null, 2, 100));
-        listaGlobal.insertarFinal(new Producto("Tango Glider Ball", 25, "Futbol clasico", null, 5, 100));
+        // Productos para la lista global
+        listaGlobal.insertarFinal(new Producto("FIFA World Cup 26 Trionda Pro Ball", 170, "Futbol clasico", null, 2, 100, "San José"));
+        listaGlobal.insertarFinal(new Producto("Tango Glider Ball", 25, "Futbol clasico", null, 5, 100, "San José"));
 
-        // 📌 Productos para el INVENTARIO DE LA TIENDA
-        System.out.println("\n🏬 Cargando inventario de la tienda...");
-        tienda.agregarProductoInventario(new Producto("FIFA World Cup 26 Trionda Pro Ball", 170, "Futbol clasico", null, 0, 100));
-        tienda.agregarProductoInventario(new Producto("FIFA World Cup 26 Trionda Competition Ball", 65, "Futbol clasico", null, 0, 100));
-        tienda.agregarProductoInventario(new Producto("FIFA World Cup 26 Trionda Pro Beach Ball", 60, "Futbol playa", null, 0, 100));
-        tienda.agregarProductoInventario(new Producto("Conext 25 League Ball", 40, "Futbol clasico", null, 0, 100));
-        tienda.agregarProductoInventario(new Producto("Tango Glider Ball", 25, "Futbol clasico", null, 0, 100));
+        // Inicializar grafo con provincias de Costa Rica
+        inicializarGrafoProvincias();
 
-        System.out.println("\n✅ Datos de ejemplo cargados exitosamente:");
-        System.out.println("   • Catálogo global: " + listaGlobal.obtenerTamano() + " productos");
-        System.out.println("   • Inventario tienda: " + contarProductosInventario(tienda.getInventario().getRaiz()) + " productos");
+        System.out.println("✅ Datos de ejemplo cargados exitosamente.");
     }
 
-    private static int contarProductosInventario(Producto nodo) {
-        if (nodo == null) return 0;
-        return 1 + contarProductosInventario(nodo.getIzquierdo()) + contarProductosInventario(nodo.getDerecho());
+    private static void inicializarGrafoProvincias() {
+        // Agregar rutas entre provincias (los vértices se crearán automáticamente)
+        grafoUbicaciones.agregarArista("San José", "Alajuela", 20);
+        grafoUbicaciones.agregarArista("San José", "Cartago", 25);
+        grafoUbicaciones.agregarArista("San José", "Heredia", 10);
+        grafoUbicaciones.agregarArista("Alajuela", "Heredia", 15);
+        grafoUbicaciones.agregarArista("Cartago", "Heredia", 30);
     }
 
     public static void menuPrincipal() {
@@ -52,9 +49,10 @@ public class Main {
                 System.out.println("\n" + "═".repeat(50));
                 System.out.println("🏪  SISTEMA INTEGRADO DE GESTIÓN DE TIENDA  🏪");
                 System.out.println("═".repeat(50));
-                System.out.println("1. 📋  Gestión de CATÁLOGO GLOBAL");
-                System.out.println("2. 🏬  Gestión de TIENDA");
-                System.out.println("3. 📊  Estado General del Sistema");
+                System.out.println("1. 📋  Gestión de Lista de Productos ");
+                System.out.println("2. 🏬  Gestión de Tienda Completa ");
+                System.out.println("3. 🗺️   Gestión de Ubicaciones (Grafo)");
+                System.out.println("4. 📊  Estado General del Sistema");
                 System.out.println("0. 🚪  Salir");
                 System.out.println("═".repeat(50));
                 System.out.print("Seleccione una opción: ");
@@ -70,6 +68,9 @@ public class Main {
                         menuGestionTienda();
                         break;
                     case 3:
+                        menuGestionUbicaciones();
+                        break;
+                    case 4:
                         mostrarEstadoGeneral();
                         break;
                     case 0:
@@ -92,17 +93,16 @@ public class Main {
         do {
             try {
                 System.out.println("\n" + "─".repeat(60));
-                System.out.println("📋  GESTIÓN DE CATÁLOGO GLOBAL");
+                System.out.println("📋  GESTIÓN DE LISTA DE PRODUCTOS ");
                 System.out.println("─".repeat(60));
-                System.out.println("1. ➕  Agregar producto al INICIO del catálogo");
-                System.out.println("2. ➕  Agregar producto al FINAL del catálogo");
-                System.out.println("3. 👁️  Mostrar TODOS los productos del catálogo");
-                System.out.println("4. 🔍  Buscar producto por nombre en catálogo");
-                System.out.println("5. 🗑️   Eliminar producto del catálogo");
-                System.out.println("6. 📈  Imprimir REPORTE DE COSTOS del catálogo");
+                System.out.println("1. ➕  Agregar producto al INICIO de la lista");
+                System.out.println("2. ➕  Agregar producto al FINAL de la lista");
+                System.out.println("3. 👁️  Mostrar TODOS los productos de la lista");
+                System.out.println("4. 🔍  Buscar producto por nombre");
+                System.out.println("5. 🗑️   Eliminar producto de la lista");
+                System.out.println("6. 📈  Imprimir REPORTE DE COSTOS de la lista");
                 System.out.println("7. 🖼️   Agregar imagen a producto existente");
                 System.out.println("8. 🔄  Cargar productos de ejemplo");
-                System.out.println("9. ⬇️  Importar producto al INVENTARIO de la tienda");
                 System.out.println("0. ↩️   Volver al menú principal");
                 System.out.println("─".repeat(60));
                 System.out.print("Seleccione una opción: ");
@@ -134,9 +134,6 @@ public class Main {
                     case 8:
                         cargarProductosEjemploLista();
                         break;
-                    case 9:
-                        importarProductoCatalogoInventario();
-                        break;
                     case 0:
                         System.out.println("↩️ Volviendo al menú principal...");
                         break;
@@ -155,7 +152,7 @@ public class Main {
         do {
             try {
                 System.out.println("\n" + "─".repeat(60));
-                System.out.println("🏬  GESTIÓN COMPLETA DE TIENDA");
+                System.out.println("🏬  GESTIÓN COMPLETA DE TIENDA ");
                 System.out.println("─".repeat(60));
                 System.out.println("1. 📦  Gestión de INVENTARIO");
                 System.out.println("2. 👥  Gestión de CLIENTES");
@@ -176,7 +173,7 @@ public class Main {
                         menuGestionClientes();
                         break;
                     case 3:
-                        tienda.atenderSiguienteCliente();
+                        tienda.atenderSiguienteCliente(grafoUbicaciones);
                         break;
                     case 4:
                         tienda.mostrarEstadoTienda();
@@ -204,10 +201,9 @@ public class Main {
             System.out.println("📦  GESTIÓN DE INVENTARIO");
             System.out.println("─".repeat(50));
             System.out.println("1. ➕  Agregar producto al inventario");
-            System.out.println("2. 👁️  Mostrar inventario COMPLETO (inorden)");
+            System.out.println("2. 👁️  Mostrar inventario COMPLETO");
             System.out.println("3. 📋  Listar productos disponibles");
             System.out.println("4. 🔍  Buscar producto en inventario");
-            System.out.println("5. 📥  Importar desde catálogo global");
             System.out.println("0. ↩️   Volver al menú anterior");
             System.out.println("─".repeat(50));
             System.out.print("Seleccione una opción: ");
@@ -226,9 +222,6 @@ public class Main {
                     break;
                 case 4:
                     buscarProductoInventario();
-                    break;
-                case 5:
-                    importarProductoCatalogoInventario();
                     break;
                 case 0:
                     break;
@@ -268,6 +261,49 @@ public class Main {
         } while (opcion != 0);
     }
 
+    // 🗺️ MENÚ PARA GESTIÓN DE UBICACIONES
+    private static void menuGestionUbicaciones() {
+        int opcion = -1;
+        do {
+            try {
+                System.out.println("\n" + "─".repeat(60));
+                System.out.println("🗺️  GESTIÓN DE UBICACIONES (Grafo)");
+                System.out.println("─".repeat(60));
+                System.out.println("1. 🛣️   Agregar nueva ruta entre ubicaciones");
+                System.out.println("2. 👁️  Mostrar todas las ubicaciones y rutas");
+                System.out.println("3. 🚚  Calcular ruta óptima entre dos ubicaciones");
+                System.out.println("4. 🔄  Cargar provincias de ejemplo (Costa Rica)");
+                System.out.println("0. ↩️   Volver al menú principal");
+                System.out.println("─".repeat(60));
+                System.out.print("Seleccione una opción: ");
+
+                opcion = Integer.parseInt(reader.readLine());
+
+                switch (opcion) {
+                    case 1:
+                        agregarRuta();
+                        break;
+                    case 2:
+                        grafoUbicaciones.mostrarGrafo();
+                        break;
+                    case 3:
+                        calcularRutaOptima();
+                        break;
+                    case 4:
+                        cargarProvinciasEjemplo();
+                        break;
+                    case 0:
+                        System.out.println("↩️ Volviendo al menú principal...");
+                        break;
+                    default:
+                        System.out.println("❌ Opción no válida.");
+                }
+            } catch (IOException | NumberFormatException e) {
+                System.out.println("❌ Error: " + e.getMessage());
+            }
+        } while (opcion != 0);
+    }
+
     //MÉTODO PARA MOSTRAR ESTADO GENERAL
     private static void mostrarEstadoGeneral() {
         System.out.println("\n" + "⭐".repeat(60));
@@ -275,9 +311,9 @@ public class Main {
         System.out.println("⭐".repeat(60));
 
         // Estado de la lista global
-        System.out.println("\n📋  CATÁLOGO GLOBAL DE PRODUCTOS:");
+        System.out.println("\n📋  LISTA GLOBAL DE PRODUCTOS:");
         if (listaGlobal.getPrimero() == null) {
-            System.out.println("   No hay productos en el catálogo global");
+            System.out.println("   No hay productos en la lista global");
         } else {
             System.out.println("   Total de productos: " + listaGlobal.obtenerTamano());
             listaGlobal.imprimirReporteCostos();
@@ -285,25 +321,30 @@ public class Main {
 
         // Estado de la tienda
         tienda.mostrarEstadoTienda();
+
+        // Estado del grafo
+        System.out.println("\n🗺️  GRAFO DE UBICACIONES:");
+        System.out.println("   Ubicaciones registradas: " + grafoUbicaciones.getNumeroVertices());
+        System.out.println("   Rutas disponibles: " + grafoUbicaciones.getNumeroAristas());
     }
 
     // 🎯 MÉTODOS PARA GESTIÓN DE LISTA
     private static void agregarProductoInicio() throws IOException {
-        System.out.println("\n🎯 AGREGAR PRODUCTO AL INICIO DEL CATÁLOGO");
+        System.out.println("\n🎯 AGREGAR PRODUCTO AL INICIO DE LA LISTA");
         Producto producto = leerDatosProducto();
         listaGlobal.insertarInicio(producto);
-        System.out.println("✅ Producto agregado al INICIO del catálogo exitosamente.");
+        System.out.println("✅ Producto agregado al INICIO de la lista exitosamente.");
     }
 
     private static void agregarProductoFinal() throws IOException {
-        System.out.println("\n🎯 AGREGAR PRODUCTO AL FINAL DEL CATÁLOGO");
+        System.out.println("\n🎯 AGREGAR PRODUCTO AL FINAL DE LA LISTA");
         Producto producto = leerDatosProducto();
         listaGlobal.insertarFinal(producto);
-        System.out.println("✅ Producto agregado al FINAL del catálogo exitosamente.");
+        System.out.println("✅ Producto agregado al FINAL de la lista exitosamente.");
     }
 
     private static void buscarProductoLista() throws IOException {
-        System.out.print("\n🔍 Ingrese el nombre del producto a buscar en el catálogo: ");
+        System.out.print("\n🔍 Ingrese el nombre del producto a buscar: ");
         String nombre = reader.readLine();
         Producto producto = listaGlobal.buscarProducto(nombre);
         if (producto != null) {
@@ -312,13 +353,13 @@ public class Main {
     }
 
     private static void eliminarProductoLista() throws IOException {
-        System.out.print("\n🗑️  Ingrese el nombre del producto a eliminar del catálogo: ");
+        System.out.print("\n🗑️  Ingrese el nombre del producto a eliminar: ");
         String nombre = reader.readLine();
         listaGlobal.eliminarProducto(nombre);
     }
 
     private static void agregarImagenProductoLista() throws IOException {
-        System.out.print("\n🖼️  Ingrese el nombre del producto del catálogo: ");
+        System.out.print("\n🖼️  Ingrese el nombre del producto: ");
         String nombre = reader.readLine();
         Producto producto = listaGlobal.buscarProducto(nombre);
         if (producto != null) {
@@ -330,11 +371,9 @@ public class Main {
     }
 
     private static void cargarProductosEjemploLista() {
-        System.out.println("\n🔄 Cargando productos de ejemplo al catálogo...");
-        listaGlobal.insertarFinal(new Producto("Balón de Práctica", 15, "Futbol", null, 10, 50));
-        listaGlobal.insertarFinal(new Producto("Balón Profesional", 80, "Futbol", null, 3, 30));
-        listaGlobal.insertarFinal(new Producto("Guantes Portero", 35, "Futbol", null, 4, 25));
-        System.out.println("✅ Productos de ejemplo cargados en el catálogo global.");
+        listaGlobal.insertarFinal(new Producto("Balón de Práctica", 15, "Futbol", null, 10, 50, "San José"));
+        listaGlobal.insertarFinal(new Producto("Balón Profesional", 80, "Futbol", null, 3, 30, "Alajuela"));
+        System.out.println("✅ Productos de ejemplo cargados en la lista global.");
     }
 
     // 🏬 MÉTODOS PARA GESTIÓN DE TIENDA
@@ -345,7 +384,7 @@ public class Main {
     }
 
     private static void buscarProductoInventario() throws IOException {
-        System.out.print("\n🔍 Ingrese el nombre del producto a buscar en el inventario: ");
+        System.out.print("\n🔍 Ingrese el nombre del producto a buscar: ");
         String nombre = reader.readLine();
         Producto producto = tienda.buscarProductoInventario(nombre);
         if (producto != null) {
@@ -356,65 +395,71 @@ public class Main {
     }
 
     private static void agregarClienteCola() throws IOException {
-        tienda.crearClienteConCarrito();
-    }
-
-    private static void importarProductoCatalogoInventario() throws IOException {
-        System.out.println("\n📥 IMPORTAR PRODUCTO DEL CATÁLOGO AL INVENTARIO");
-
-        if (listaGlobal.estaVacia()) {
-            System.out.println("❌ El catálogo global está vacío.");
-            return;
-        }
-
-        System.out.print("🔍 Nombre del producto a importar: ");
-        String nombre = reader.readLine();
-
-        Producto productoCopia = listaGlobal.obtenerCopiaParaInventario(nombre);
-
-        if (productoCopia != null) {
-            // Verificar si ya existe en inventario
-            Producto existente = tienda.buscarProductoInventario(nombre);
-            if (existente != null) {
-                System.out.print("⚠️  Producto ya existe en inventario. ¿Aumentar stock? (s/n): ");
-                String respuesta = reader.readLine();
-                if (respuesta.equalsIgnoreCase("s")) {
-                    existente.aumentarInventario(productoCopia.getInventario());
-                    System.out.println("✅ Stock aumentado en " + productoCopia.getInventario() + " unidades.");
-                } else {
-                    System.out.println("❌ Importación cancelada.");
-                }
-            } else {
-                // Agregar nuevo producto al inventario
-                tienda.agregarProductoInventario(productoCopia);
-                System.out.println("✅ Producto importado del catálogo al inventario.");
-            }
-        }
+        tienda.crearClienteConCarrito(grafoUbicaciones);
     }
 
     private static void cargarDatosEjemploTienda() {
-        System.out.println("\n🔄 Cargando datos de ejemplo para la tienda...");
-
         // Agregar algunos clientes de ejemplo
-        Cliente cliente1 = new Cliente("Juan Pérez", 1);
+        Cliente cliente1 = new Cliente("Juan Pérez", 1, "Alajuela");
         cliente1.agregarAlCarrito(tienda.buscarProductoInventario("Tango Glider Ball"), 2);
 
-        Cliente cliente2 = new Cliente("María García", 2);
+        Cliente cliente2 = new Cliente("María García", 2, "Cartago");
         cliente2.agregarAlCarrito(tienda.buscarProductoInventario("FIFA World Cup 26 Trionda Pro Ball"), 1);
 
-        Cliente cliente3 = new Cliente("Carlos López", 3);
+        Cliente cliente3 = new Cliente("Carlos López", 3, "Heredia");
         cliente3.agregarAlCarrito(tienda.buscarProductoInventario("Conext 25 League Ball"), 3);
-
-        Cliente cliente4 = new Cliente("Ana Rodríguez", 3); // Premium
-        cliente4.agregarAlCarrito(tienda.buscarProductoInventario("FIFA World Cup 26 Trionda Pro Beach Ball"), 1);
 
         tienda.agregarCliente(cliente1);
         tienda.agregarCliente(cliente2);
         tienda.agregarCliente(cliente3);
-        tienda.agregarCliente(cliente4);
 
-        System.out.println("✅ " + tienda.getColaClientes().obtenerTamanoTotal() + " clientes de ejemplo cargados en la tienda.");
-        System.out.println("   (Ordenados por prioridad: Premium > Afiliado > Básico)");
+        System.out.println("✅ Datos de ejemplo cargados en la tienda.");
+    }
+
+    // 🗺️ MÉTODOS PARA GESTIÓN DE GRAFO
+    private static void agregarRuta() throws IOException {
+        System.out.print("\n🛣️  Ingrese la ubicación de origen: ");
+        String origen = reader.readLine();
+
+        System.out.print("🛣️  Ingrese la ubicación de destino: ");
+        String destino = reader.readLine();
+
+        System.out.print("📏 Ingrese la distancia en kilómetros: ");
+        int distancia = Integer.parseInt(reader.readLine());
+
+        // El grafo crea automáticamente los vértices si no existen
+        grafoUbicaciones.agregarArista(origen, destino, distancia);
+        System.out.println("✅ Ruta agregada: " + origen + " ↔ " + destino + " (" + distancia + " km)");
+        System.out.println("📍 Nota: Los vértices se crearon automáticamente si no existían.");
+    }
+
+    private static void calcularRutaOptima() throws IOException {
+        System.out.print("\n📍 Ingrese la ubicación de origen: ");
+        String origen = reader.readLine();
+
+        System.out.print("📍 Ingrese la ubicación de destino: ");
+        String destino = reader.readLine();
+
+        String resultado = grafoUbicaciones.calcularRutaOptima(origen, destino);
+        System.out.println(resultado);
+    }
+
+    private static void cargarProvinciasEjemplo() {
+        System.out.println("\n🔄 Cargando provincias de Costa Rica...");
+
+        // Agregar rutas entre provincias (los vértices se crearán automáticamente)
+        grafoUbicaciones.agregarArista("San José", "Alajuela", 20);
+        grafoUbicaciones.agregarArista("San José", "Cartago", 25);
+        grafoUbicaciones.agregarArista("San José", "Heredia", 10);
+        grafoUbicaciones.agregarArista("Alajuela", "Heredia", 15);
+        grafoUbicaciones.agregarArista("Cartago", "Heredia", 30);
+        grafoUbicaciones.agregarArista("Alajuela", "Puntarenas", 150);
+        grafoUbicaciones.agregarArista("San José", "Limón", 120);
+        grafoUbicaciones.agregarArista("Cartago", "Limón", 90);
+
+        System.out.println("✅ Provincias de ejemplo cargadas.");
+        System.out.println("   Ubicaciones: " + grafoUbicaciones.getNumeroVertices());
+        System.out.println("   Rutas: " + grafoUbicaciones.getNumeroAristas());
     }
 
     // MÉTODO COMPARTIDO PARA LEER DATOS DE PRODUCTO
@@ -441,7 +486,10 @@ public class Main {
         System.out.print("   Inventario disponible: ");
         int inventario = Integer.parseInt(reader.readLine());
 
-        Producto producto = new Producto(nombre, precio, categoria, fechaVencimiento, cantidad, inventario);
+        System.out.print("   Ubicación: ");
+        String ubicacion = reader.readLine();
+
+        Producto producto = new Producto(nombre, precio, categoria, fechaVencimiento, cantidad, inventario, ubicacion);
 
         // Opción para agregar imágenes
         System.out.print("   ¿Desea agregar una imagen? (s/n): ");
